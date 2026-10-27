@@ -1,0 +1,39 @@
+# --- Dados financeiros pessoais: NUNCA versionar ---
+# Ignora tudo em data/, exceto a pasta de exemplos sintéticos
+data/*
+!data/sample/
+
+# Segurança extra: qualquer CSV fica de fora, exceto exemplos e fixtures de teste
+*.csv
+!data/sample/*.csv
+!tests/fixtures/*.csv
+
+# Bancos locais
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Segredos e configuração local ---
+.env
+.env.*
+!.env.example
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# --- Testes e cobertura ---
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- Editores e sistema ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
