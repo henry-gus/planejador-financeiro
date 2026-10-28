@@ -2,7 +2,7 @@
 
 Aplicação em Python para organização financeira pessoal: importar extratos e faturas em CSV, categorizar transações, acompanhar gastos fixos, reserva de emergência, saldo livre e objetivos.
 
-> **Status:** em desenvolvimento. Esta versão contém apenas a base do domínio (modelos e testes).
+> **Status:** em desenvolvimento. Esta versão contém o domínio (modelos) e o importador de extrato em CSV.
 
 ## Princípios
 
@@ -15,8 +15,9 @@ Aplicação em Python para organização financeira pessoal: importar extratos e
 | Componente | Descrição |
 |---|---|
 | `TipoTransacao` | Enum de entrada (`1`) e saída (`0`) |
-| `Transacao` | Data, descrição, tipo, valor, categoria e marcação de gasto fixo, com validação (valor positivo) |
-| `Conta` | Saldo calculado a partir das transações, totais de entradas e saídas e gastos por categoria, com filtro por ano e mês |
+| `Transacao` | Data, descrição, tipo, valor, categoria, marcação de gasto fixo e id estável, com validação (valor positivo) |
+| `Conta` | Saldo calculado a partir das transações, totais de entradas e saídas, gastos por categoria (filtro por ano e mês) e importação sem duplicatas |
+| `ler_extrato` | Lê o CSV de extrato de conta corrente (padrão brasileiro), valida a coluna de saldo e gera ids para evitar duplicatas ao reimportar |
 
 ## Estrutura
 
@@ -24,12 +25,11 @@ Aplicação em Python para organização financeira pessoal: importar extratos e
 planejador-financeiro/
 ├── pytest.ini
 ├── requirements.txt
-├── src/
-│   └── planejador/
-│       ├── __init__.py
-│       └── modelos.py
-└── tests/
-    └── test_modelos.py
+└── src/
+    └── planejador/
+        ├── __init__.py
+        ├── modelos.py
+        └── importador.py
 ```
 
 ## Como rodar
@@ -40,19 +40,22 @@ Requer Python 3.10 ou superior.
 python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 python -m pip install -r requirements.txt
-python -m pytest
 ```
 
-Execute os comandos sempre a partir da raiz do projeto: o `pytest.ini` configura o `src/` no caminho de importação.
+## Testes
+
+A suíte de testes é mantida apenas localmente: a pasta `tests/` está no `.gitignore` e não é versionada.
 
 ## Dados pessoais e Git
 
-Extratos reais nunca devem ser versionados. O `.gitignore` bloqueia a pasta `data/` (exceto `data/sample/`, reservada para exemplos sintéticos), qualquer arquivo `.csv` fora de `data/sample/` e `tests/fixtures/`, bancos locais e arquivos `.env`.
+Extratos reais nunca devem ser versionados. Coloque-os em `data/raw/`. O `.gitignore` bloqueia a pasta `data/` (exceto `data/sample/`, reservada para exemplos sintéticos), qualquer arquivo `.csv` fora de `data/sample/`, bancos locais, arquivos `.env` e a pasta `tests/`.
 
 ## Roadmap
 
+- [x] Modelos de domínio (`Transacao`, `Conta`)
+- [x] Importador de CSV de extrato, sem duplicar transações
+- [ ] Importador de CSV de fatura de cartão
 - [ ] Persistência local em SQLite
-- [ ] Importador de CSV de fatura e extrato, sem duplicar transações
 - [ ] Categorias com grupos (essencial, discricionário, poupança) e categorização manual com regras aprendidas
 - [ ] Cálculos: gastos fixos, reserva de emergência e saldo livre
 - [ ] Objetivos financeiros (valor-alvo, prazo e aporte mensal necessário)

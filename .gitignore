@@ -3,15 +3,17 @@
 data/*
 !data/sample/
 
-# Segurança extra: qualquer CSV fica de fora, exceto exemplos e fixtures de teste
+# Segurança extra: qualquer CSV fica de fora, exceto exemplos sintéticos
 *.csv
 !data/sample/*.csv
-!tests/fixtures/*.csv
 
 # Bancos locais
 *.db
 *.sqlite
 *.sqlite3
+
+# --- Testes: mantidos apenas localmente ---
+tests/
 
 # --- Segredos e configuração local ---
 .env
@@ -27,7 +29,7 @@ __pycache__/
 build/
 dist/
 
-# --- Testes e cobertura ---
+# --- Cobertura e caches de teste ---
 .pytest_cache/
 .coverage
 htmlcov/

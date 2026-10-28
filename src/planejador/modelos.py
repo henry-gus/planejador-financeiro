@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from enum import IntEnum
 
 CENTAVOS = Decimal("0.01")
@@ -12,14 +12,20 @@ SEM_CATEGORIA = "Sem categoria"
 
 
 def para_dinheiro(valor) -> Decimal:
-    """
-    Converte para Decimal com 2 casas decimais.
-    Passa por str() para evitar o ruído de float.
+    """Converte para Decimal com 2 casas decimais.
+
+    Passa por str() para evitar o ruído de float: Decimal(0.1) vira
+    0.1000000000000000055..., enquanto Decimal(str(0.1)) vira 0.1.
     """
     return Decimal(str(valor)).quantize(CENTAVOS, rounding=ROUND_HALF_UP)
 
 
 class TipoTransacao(IntEnum):
+    """Mantém a convenção original: 1 = entrada, 0 = saída.
+
+    Como é IntEnum, TipoTransacao(True) e TipoTransacao(0) continuam funcionando.
+    """
+
     SAIDA = 0
     ENTRADA = 1
 
@@ -32,6 +38,7 @@ class Transacao:
     valor: Decimal
     categoria: str = SEM_CATEGORIA
     fixo: bool = False  # marcação manual de gasto fixo
+    id: str | None = None  # identificador estável gerado na importação (evita duplicatas)
 
     def __post_init__(self):
         self.tipo = TipoTransacao(self.tipo)
@@ -58,6 +65,22 @@ class Conta:
 
     def adicionar_transacao(self, transacao: Transacao) -> None:
         self.transacoes.append(transacao)
+
+    def adicionar_transacoes(self, transacoes) -> int:
+        """Adiciona várias transações, ignorando as que já existem (mesmo id).
+
+        Retorna quantas eram novas. Reimportar o mesmo arquivo retorna 0.
+        """
+        ids_existentes = {t.id for t in self.transacoes if t.id is not None}
+        novas = 0
+        for transacao in transacoes:
+            if transacao.id is not None:
+                if transacao.id in ids_existentes:
+                    continue
+                ids_existentes.add(transacao.id)
+            self.transacoes.append(transacao)
+            novas += 1
+        return novas
 
     # --- leitura -----------------------------------------------------------
 
